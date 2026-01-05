@@ -1,0 +1,28 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cassandra-driver": "^4.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongoose": "^9.1.1",
+    "morgan": "^1.10.1",
+    "neo4j-driver": "^6.0.1",
+    "redis": "^5.10.0",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
