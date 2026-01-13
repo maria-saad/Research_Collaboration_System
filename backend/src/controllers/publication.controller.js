@@ -1,5 +1,6 @@
 const Publication = require("../models/Publication");
 const { asyncHandler } = require("../utils/asyncHandler");
+const { getCachedData, setCachedData } = require("../services/cache.service");
 
 const create = asyncHandler(async (req, res) => {
   const doc = await Publication.create(req.body);
@@ -41,4 +42,28 @@ const remove = asyncHandler(async (req, res) => {
   res.json({ deleted: true });
 });
 
-module.exports = { create, list, getById, update, remove };
+const getRecent = asyncHandler(async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit || "10", 10), 50); // سقف حماية
+  const cacheKey = `publications:recent:limit=${limit}`;
+
+  // 1) Try Redis
+  const cached = await getCachedData(cacheKey);
+  if (cached) {
+    return res.json({ source: "cache", limit, publications: cached });
+  }
+
+  // 2) Query MongoDB
+  const publications = await Publication.find()
+    .sort({ year: -1, createdAt: -1 }) // الأحدث
+    .limit(limit)
+    .populate("authors", "name email affiliation") // إذا عندك authors ref
+    .lean();
+
+  // 3) Store in Redis (TTL 60s)
+  await setCachedData(cacheKey, publications, 60);
+
+  res.json({ source: "db", limit, publications });
+});
+
+
+module.exports = { create, list, getById, update, remove, getRecent };

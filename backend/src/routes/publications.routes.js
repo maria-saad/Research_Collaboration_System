@@ -2,6 +2,7 @@ const router = require("express").Router();
 const c = require("../controllers/publication.controller");
 const { validate } = require("../middlewares/validate");
 const { createPublicationSchema, updatePublicationSchema } = require("../validators/publication.validator");
+router.get("/recent", c.getRecent);
 
 router.post("/", validate(createPublicationSchema), c.create);
 router.get("/", c.list);

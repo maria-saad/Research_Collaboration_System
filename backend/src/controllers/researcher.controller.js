@@ -1,4 +1,5 @@
 const Researcher = require("../models/Researcher");
+const Project = require("../models/Project"); // ✅ مهم
 const { asyncHandler } = require("../utils/asyncHandler");
 
 const create = asyncHandler(async (req, res) => {
@@ -33,4 +34,51 @@ const remove = asyncHandler(async (req, res) => {
   res.json({ deleted: true });
 });
 
-module.exports = { create, list, getById, update, remove };
+// ✅ GET /api/researchers/:id/projects
+const getResearcherProjects = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const projects = await Project.find({
+    owner: id
+  })
+    .sort({ createdAt: -1 })
+    .populate("owner", "name email affiliation")
+    .lean();
+
+  res.json({
+    researcherId: id,
+    count: projects.length,
+    projects
+  });
+});
+const Publication = require("../models/Publication");
+
+// ✅ GET /api/researchers/:id/publications
+const getResearcherPublications = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const publications = await Publication.find({
+    $or: [
+      { authors: id }
+    ]
+  })
+    .sort({ year: -1, createdAt: -1 })
+    .populate("authors", "name email affiliation")
+    .lean();
+
+  res.json({
+    researcherId: id,
+    count: publications.length,
+    publications
+  });
+});
+
+module.exports = {
+  create,
+  list,
+  getById,
+  update,
+  remove,
+  getResearcherProjects,
+  getResearcherPublications
+};
