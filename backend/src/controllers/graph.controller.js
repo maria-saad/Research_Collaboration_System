@@ -72,6 +72,7 @@ const createCollaboration = asyncHandler(async (req, res) => {
 });
 
 // 3) Get collaborators for researcher
+// 3) Get collaborators for researcher
 const getCollaborators = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
