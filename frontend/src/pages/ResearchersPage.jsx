@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api/client";
+import { researchersApi } from "../api/researchers";
 import Loader from "../components/Loader";
 import ErrorBox from "../components/ErrorBox";
 import { Link } from "react-router-dom";
@@ -14,8 +14,9 @@ export default function ResearchersPage() {
     (async () => {
       try {
         setErr("");
-        const res = await api.get("/researchers");
-        if (mounted) setItems(res.data);
+        const data = await researchersApi.list();
+if (mounted) setItems(data);
+
       } catch (e) {
         setErr(e?.response?.data?.error?.message || e.message || "Failed to load researchers");
       } finally {
@@ -31,6 +32,15 @@ export default function ResearchersPage() {
     <div style={{ padding: 12 }}>
       <h2>Researchers</h2>
       <ErrorBox message={err} />
+<div style={{ marginBottom: 12 }}>
+  <Link to="/publications/recent">
+    <button>View Recent Publications</button>
+  </Link>
+  <Link to="/projects/team">
+  <button>Project Team</button>
+</Link>
+
+</div>
 
       {items.length === 0 ? (
         <div>No researchers found. Create one from Create page.</div>

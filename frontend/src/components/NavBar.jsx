@@ -14,6 +14,14 @@ export default function NavBar() {
       </Link>
 
       <NavLink to="/researchers" style={linkStyle}>Researchers</NavLink>
+      
+            <NavLink to="/publications/recent" style={linkStyle}>
+              Recent Publications
+            </NavLink>
+
+            <NavLink to="/projects/team" style={linkStyle}>
+              Project Team
+            </NavLink>
       <NavLink to="/analytics" style={linkStyle}>Analytics</NavLink>
       <NavLink to="/create" style={linkStyle}>Create</NavLink>
     </div>

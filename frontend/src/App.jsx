@@ -5,6 +5,9 @@ import ResearchersPage from "./pages/ResearchersPage";
 import ProfilePage from "./pages/ProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import CreateResearcherPage from "./pages/CreateResearcherPage";
+import RecentPublicationsPage from "./pages/RecentPublicationsPage";
+import ProjectTeamPage from "./pages/ProjectTeamPage";
+
 
 export default function App() {
   return (
@@ -16,6 +19,9 @@ export default function App() {
         <Route path="/profile/:id" element={<ProfilePage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/create" element={<CreateResearcherPage />} />
+        <Route path="/publications/recent" element={<RecentPublicationsPage />} />
+<Route path="/projects/team" element={<ProjectTeamPage />} />
+
         <Route path="*" element={<div style={{ padding: 12 }}>Not Found</div>} />
       </Routes>
     </BrowserRouter>
