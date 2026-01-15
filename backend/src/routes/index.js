@@ -12,5 +12,6 @@ router.use("/publications", publicationsRoutes);
 router.use("/graph", require("./graph.routes"));
 router.use("/", require("./profile.routes"));
 router.use("/analytics", require("./analytics.routes"));
+router.use("/notes", require("./notes.routes"));
 
 module.exports = router;

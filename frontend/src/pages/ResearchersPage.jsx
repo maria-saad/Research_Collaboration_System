@@ -33,12 +33,7 @@ if (mounted) setItems(data);
       <h2>Researchers</h2>
       <ErrorBox message={err} />
 <div style={{ marginBottom: 12 }}>
-  <Link to="/publications/recent">
-    <button>View Recent Publications</button>
-  </Link>
-  <Link to="/projects/team">
-  <button>Project Team</button>
-</Link>
+
 
 </div>
 

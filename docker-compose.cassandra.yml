@@ -1,0 +1,74 @@
+# docker-compose.cassandra.yml
+# ملاحظة: ما في داعي لـ version مع Docker Compose الجديد
+
+services:
+  cassandra1:
+    image: cassandra:4.1
+    container_name: cassandra-node1
+    hostname: cassandra1
+    environment:
+      CASSANDRA_CLUSTER_NAME: "rcs_cluster"
+      CASSANDRA_SEEDS: "cassandra1,cassandra2,cassandra3"
+      CASSANDRA_DC: "datacenter1"
+      CASSANDRA_RACK: "rack1"
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra1_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+
+  cassandra2:
+    image: cassandra:4.1
+    container_name: cassandra-node2
+    hostname: cassandra2
+    environment:
+      CASSANDRA_CLUSTER_NAME: "rcs_cluster"
+      CASSANDRA_SEEDS: "cassandra1,cassandra2,cassandra3"
+      CASSANDRA_DC: "datacenter1"
+      CASSANDRA_RACK: "rack1"
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+    depends_on:
+      cassandra1:
+        condition: service_healthy
+    ports:
+      - "9043:9042"
+    volumes:
+      - cassandra2_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+
+  cassandra3:
+    image: cassandra:4.1
+    container_name: cassandra-node3
+    hostname: cassandra3
+    environment:
+      CASSANDRA_CLUSTER_NAME: "rcs_cluster"
+      CASSANDRA_SEEDS: "cassandra1,cassandra2,cassandra3"
+      CASSANDRA_DC: "datacenter1"
+      CASSANDRA_RACK: "rack1"
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+    depends_on:
+      cassandra1:
+        condition: service_healthy
+    ports:
+      - "9044:9042"
+    volumes:
+      - cassandra3_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+
+volumes:
+  cassandra1_data:
+  cassandra2_data:
+  cassandra3_data:
