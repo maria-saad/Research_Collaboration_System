@@ -24,6 +24,8 @@ export default function NavBar() {
             </NavLink>
       <NavLink to="/analytics" style={linkStyle}>Analytics</NavLink>
       <NavLink to="/create" style={linkStyle}>Create</NavLink>
+      <NavLink to="/projects">Projects </NavLink>
+<NavLink to="/publications">Publications </NavLink>
     </div>
   );
 }

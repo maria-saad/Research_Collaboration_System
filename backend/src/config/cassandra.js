@@ -2,49 +2,75 @@ const cassandra = require("cassandra-driver");
 
 let client;
 
-function parseContactPoints(raw) {
-  // input example: "127.0.0.1:9042,127.0.0.1:9043,127.0.0.1:9044"
+function parseContactPoints() {
+  const raw =
+    process.env.CASSANDRA_CONTACT_POINTS ||
+    process.env.CASSANDRA_NODES ||
+    "127.0.0.1";
+
   const items = (raw || "")
     .split(",")
-    .map(s => s.trim())
+    .map((s) => s.trim())
     .filter(Boolean);
 
-  // driver wants hosts only (strings)
-  const hosts = items.map(x => x.split(":")[0].trim());
+  const hosts = items.map((x) => x.split(":")[0].trim());
 
-  // if ports are provided, take the first one as the cluster port
-  const firstPort = items[0]?.includes(":") ? Number(items[0].split(":")[1]) : 9042;
+  const firstPort = items[0]?.includes(":")
+    ? Number(items[0].split(":")[1])
+    : 9042;
 
-  return { hosts, port: Number.isFinite(firstPort) ? firstPort : 9042 };
+  return {
+    hosts,
+    port: Number.isFinite(firstPort) ? firstPort : 9042,
+  };
 }
 
 async function initCassandra() {
-  const raw = process.env.CASSANDRA_CONTACT_POINTS || "127.0.0.1:9042";
-  const localDataCenter = process.env.CASSANDRA_LOCAL_DATACENTER || "datacenter1";
+  const localDataCenter =
+    process.env.CASSANDRA_LOCAL_DATACENTER ||
+    process.env.CASSANDRA_DC ||
+    "datacenter1";
+
   const keyspace = process.env.CASSANDRA_KEYSPACE || "analytics";
 
-  const { hosts, port } = parseContactPoints(raw);
+  const { hosts, port } = parseContactPoints();
+  if (!hosts.length) throw new Error("Cassandra hosts list is empty.");
 
-  if (!hosts.length) throw new Error("CASSANDRA_CONTACT_POINTS is empty/invalid");
-
-  client = new cassandra.Client({
-    contactPoints: hosts,                // ✅ strings only
+  // 1) client بدون keyspace (فقط لإنشاء الـ keyspace)
+  const bootstrapClient = new cassandra.Client({
+    contactPoints: hosts,
     localDataCenter,
-    protocolOptions: { port },           // ✅ port here
-    socketOptions: { connectTimeout: 10000 }
+    protocolOptions: { port },
+    socketOptions: { connectTimeout: 10000 },
   });
 
-  console.log("🟣 Connecting to Cassandra...");
+  console.log("Connecting to Cassandra (bootstrap)...");
+  await bootstrapClient.connect();
+  console.log("Cassandra connected (bootstrap)");
+
+  // replication_factor=3 (مناسب لـ 3-node cluster)
+  await bootstrapClient.execute(
+    `CREATE KEYSPACE IF NOT EXISTS ${keyspace}
+     WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3}`
+  );
+
+  // 2) سكّري bootstrapClient
+  await bootstrapClient.shutdown();
+
+  // 3) افتحي client جديد مربوط بالـ keyspace
+  client = new cassandra.Client({
+    contactPoints: hosts,
+    localDataCenter,
+    protocolOptions: { port },
+    keyspace, // ✅ أهم سطر: اربطي كل الاستعلامات بهذا الـ keyspace
+    socketOptions: { connectTimeout: 10000 },
+  });
+
+  console.log(`Connecting to Cassandra (keyspace=${keyspace})...`);
   await client.connect();
-  console.log("🟣 Cassandra connected");
+  console.log("Cassandra connected");
 
-  await client.execute(`
-    CREATE KEYSPACE IF NOT EXISTS ${keyspace}
-    WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3}
-  `);
-
-  await client.execute(`USE ${keyspace}`);
-
+  // 4) Create tables داخل نفس keyspace
   await client.execute(`
     CREATE TABLE IF NOT EXISTS notes (
       id uuid PRIMARY KEY,
@@ -54,7 +80,18 @@ async function initCassandra() {
     )
   `);
 
-  console.log("🟣 Cassandra keyspace & table ready");
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS analytics_events (
+      researcher_id text,
+      year int,
+      metric_type text,
+      value double,
+      computed_at timestamp,
+      PRIMARY KEY ((researcher_id), year, metric_type)
+    ) WITH CLUSTERING ORDER BY (year DESC, metric_type ASC)
+  `);
+
+  console.log("Cassandra keyspace & tables ready");
 }
 
 function getCassandraClient() {
@@ -65,8 +102,12 @@ function getCassandraClient() {
 async function shutdownCassandra() {
   if (client) {
     await client.shutdown();
-    console.log("🟣 Cassandra disconnected");
+    console.log("Cassandra disconnected");
   }
 }
 
-module.exports = { initCassandra, getCassandraClient, shutdownCassandra };
+module.exports = {
+  initCassandra,
+  getCassandraClient,
+  shutdownCassandra,
+};
