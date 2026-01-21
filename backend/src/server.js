@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const app = require("./app");
+const logger = require("./logger");
 
 // ===== Database configs =====
 const { connectMongo } = require("./config/mongo");
@@ -16,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 
 (async () => {
   try {
-    console.log("🚀 Starting Research Collaboration Backend...");
+logger.info("Starting Research Collaboration Backend...");
 
     // 1️⃣ MongoDB
     await connectMongo();
@@ -33,7 +34,7 @@ const PORT = process.env.PORT || 5000;
     });
 
   } catch (err) {
-    console.error("❌ Startup error:", err);
+logger.error(`Startup error: ${err.message}`);
     process.exit(1);
   }
 })();
