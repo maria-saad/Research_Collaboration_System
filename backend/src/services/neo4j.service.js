@@ -1,4 +1,4 @@
-const driver = require("../config/neo4j");
+const driver = require('../config/neo4j');
 
 // helper لتشغيل query بأمان
 async function runQuery(cypher, params = {}) {

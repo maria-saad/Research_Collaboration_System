@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const Publication = require("../models/Publication");
-const analyticsEventsService = require("./analyticsEvents.service");
+const mongoose = require('mongoose');
+const Publication = require('../models/Publication');
+const analyticsEventsService = require('./analyticsEvents.service');
 
 /**
  * Recompute yearly publications count per researcher from MongoDB
@@ -15,11 +15,11 @@ const analyticsEventsService = require("./analyticsEvents.service");
  */
 async function recomputePublicationsPerYear(year) {
   const yr = Number(year);
-  if (!Number.isFinite(yr)) throw new Error("Invalid year");
+  if (!Number.isFinite(yr)) throw new Error('Invalid year');
 
   // 1) Fetch publications for that year (lean for performance)
   const pubs = await Publication.find({ year: yr })
-    .select("authors year") // only needed fields
+    .select('authors year') // only needed fields
     .lean();
 
   // 2) Count publications per researcherId
@@ -41,7 +41,7 @@ async function recomputePublicationsPerYear(year) {
     await analyticsEventsService.upsertEvent({
       researcherId,
       year: yr,
-      metricType: "publications",
+      metricType: 'publications',
       value: count,
     });
     metricsWritten++;

@@ -1,23 +1,20 @@
-require("dotenv").config();
+require('dotenv').config();
 
-const app = require("./app");
-const logger = require("./logger");
+const app = require('./app');
+const logger = require('./logger');
 
 // ===== Database configs =====
-const { connectMongo } = require("./config/mongo");
-const redisClient = require("./config/redis");
-const neo4jDriver = require("./config/neo4j");
-const {
-  initCassandra,
-  shutdownCassandra
-} = require("./config/cassandra");
+const { connectMongo } = require('./config/mongo');
+const redisClient = require('./config/redis');
+const neo4jDriver = require('./config/neo4j');
+const { initCassandra, shutdownCassandra } = require('./config/cassandra');
 
 // ===== Server config =====
 const PORT = process.env.PORT || 5000;
 
 (async () => {
   try {
-logger.info("Starting Research Collaboration Backend...");
+    logger.info('Starting Research Collaboration Backend...');
 
     // 1️⃣ MongoDB
     await connectMongo();
@@ -32,16 +29,15 @@ logger.info("Starting Research Collaboration Backend...");
     app.listen(PORT, () => {
       console.log(`✅ API running on http://localhost:${PORT}`);
     });
-
   } catch (err) {
-logger.error(`Startup error: ${err.message}`);
+    logger.error(`Startup error: ${err.message}`);
     process.exit(1);
   }
 })();
 
 // ===== Graceful shutdown =====
-process.on("SIGINT", async () => {
-  console.log("\n🛑 Shutting down services...");
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Shutting down services...');
 
   try {
     // Cassandra
@@ -50,20 +46,19 @@ process.on("SIGINT", async () => {
     // Redis
     if (redisClient.isOpen) {
       await redisClient.quit();
-      console.log("🟥 Redis disconnected");
+      console.log('🟥 Redis disconnected');
     }
 
     // Neo4j
     await neo4jDriver.close();
-    console.log("🟦 Neo4j disconnected");
+    console.log('🟦 Neo4j disconnected');
 
     // MongoDB
-    const mongoose = require("mongoose");
+    const mongoose = require('mongoose');
     await mongoose.connection.close();
-    console.log("🟩 MongoDB disconnected");
-
+    console.log('🟩 MongoDB disconnected');
   } catch (err) {
-    console.error("⚠️ Error during shutdown:", err);
+    console.error('⚠️ Error during shutdown:', err);
   } finally {
     process.exit(0);
   }

@@ -1,16 +1,17 @@
-const { asyncHandler } = require("../utils/asyncHandler");
-const { runQuery } = require("../services/neo4j.service");
-const { getCachedData, setCachedData } = require("../services/cache.service");
+const { asyncHandler } = require('../utils/asyncHandler');
+const { runQuery } = require('../services/neo4j.service');
+const { getCachedData, setCachedData } = require('../services/cache.service');
 
 function toJsNumber(v) {
-  if (v && typeof v.toNumber === "function") return v.toNumber();
+  if (v && typeof v.toNumber === 'function') return v.toNumber();
   return Number(v ?? 0);
 }
 
 const getTopResearchers = asyncHandler(async (req, res) => {
   const raw = req.query.limit;
-  const parsed = Number.parseInt(raw ?? "5", 10);
-  const limit = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 50) : 5;
+  const parsed = Number.parseInt(raw ?? '5', 10);
+  const limit =
+    Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 50) : 5;
 
   // 1) Cache key (depends on limit)
   const cacheKey = `analytics:top-researchers:limit=${limit}`;
@@ -19,8 +20,8 @@ const getTopResearchers = asyncHandler(async (req, res) => {
   const cached = await getCachedData(cacheKey);
   if (cached) {
     return res.json({
-      source: "cache",
-      ...cached
+      source: 'cache',
+      ...cached,
     });
   }
 
@@ -37,10 +38,10 @@ const getTopResearchers = asyncHandler(async (req, res) => {
   const result = await runQuery(cypher, { limit });
 
   const topResearchers = result.records.map((rec) => ({
-    id: rec.get("id"),
-    name: rec.get("name"),
-    email: rec.get("email"),
-    collaborationsCount: toJsNumber(rec.get("collaborationsCount")),
+    id: rec.get('id'),
+    name: rec.get('name'),
+    email: rec.get('email'),
+    collaborationsCount: toJsNumber(rec.get('collaborationsCount')),
   }));
 
   const payload = { limit, topResearchers };
@@ -49,8 +50,8 @@ const getTopResearchers = asyncHandler(async (req, res) => {
   await setCachedData(cacheKey, payload, 30);
 
   res.json({
-    source: "db",
-    ...payload
+    source: 'db',
+    ...payload,
   });
 });
 

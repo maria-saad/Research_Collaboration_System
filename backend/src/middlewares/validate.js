@@ -3,7 +3,7 @@ const validate = (schema) => (req, res, next) => {
   if (!result.success) {
     return res.status(400).json({
       error: {
-        message: "Validation error",
+        message: 'Validation error',
         details: result.error.issues,
       },
     });

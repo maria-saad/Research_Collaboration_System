@@ -1,6 +1,12 @@
-const { getCassandraClient } = require("../config/cassandra");
+const { getCassandraClient } = require('../config/cassandra');
 
-async function upsertEvent({ researcherId, year, metricType, value, computedAt }) {
+async function upsertEvent({
+  researcherId,
+  year,
+  metricType,
+  value,
+  computedAt,
+}) {
   const client = getCassandraClient();
 
   const yr = Number(year);
@@ -40,7 +46,9 @@ async function getEventsByResearcherAndYear(researcherId, year) {
     WHERE researcher_id = ? AND year = ?
   `;
 
-  const result = await client.execute(query, [researcherId, yr], { prepare: true });
+  const result = await client.execute(query, [researcherId, yr], {
+    prepare: true,
+  });
   return result.rows;
 }
 

@@ -1,4 +1,4 @@
-const { z } = require("zod");
+const { z } = require('zod');
 
 const createPublicationSchema = z.object({
   title: z.string().min(2),
@@ -6,7 +6,7 @@ const createPublicationSchema = z.object({
   venue: z.string().optional(),
   keywords: z.array(z.string()).optional(),
   authors: z.array(z.string()).min(1),
-  project: z.string().optional()
+  project: z.string().optional(),
 });
 
 const updatePublicationSchema = createPublicationSchema.partial();

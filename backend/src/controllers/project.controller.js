@@ -1,6 +1,6 @@
-const Project = require("../models/Project");
-const { asyncHandler } = require("../utils/asyncHandler");
-const { runQuery } = require("../services/neo4j.service");
+const Project = require('../models/Project');
+const { asyncHandler } = require('../utils/asyncHandler');
+const { runQuery } = require('../services/neo4j.service');
 
 const create = asyncHandler(async (req, res) => {
   const doc = await Project.create(req.body);
@@ -9,8 +9,8 @@ const create = asyncHandler(async (req, res) => {
 
 const list = asyncHandler(async (req, res) => {
   const docs = await Project.find()
-    .populate("owner", "name email affiliation")
-    .populate("collaborators", "name email")
+    .populate('owner', 'name email affiliation')
+    .populate('collaborators', 'name email')
     .sort({ createdAt: -1 })
     .lean();
   res.json(docs);
@@ -18,27 +18,30 @@ const list = asyncHandler(async (req, res) => {
 
 const getById = asyncHandler(async (req, res) => {
   const doc = await Project.findById(req.params.id)
-    .populate("owner", "name email affiliation")
-    .populate("collaborators", "name email")
+    .populate('owner', 'name email affiliation')
+    .populate('collaborators', 'name email')
     .lean();
 
-  if (!doc) return res.status(404).json({ error: { message: "Project not found" } });
+  if (!doc)
+    return res.status(404).json({ error: { message: 'Project not found' } });
   res.json(doc);
 });
 
 const update = asyncHandler(async (req, res) => {
   const doc = await Project.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true
+    runValidators: true,
   }).lean();
 
-  if (!doc) return res.status(404).json({ error: { message: "Project not found" } });
+  if (!doc)
+    return res.status(404).json({ error: { message: 'Project not found' } });
   res.json(doc);
 });
 
 const remove = asyncHandler(async (req, res) => {
   const doc = await Project.findByIdAndDelete(req.params.id).lean();
-  if (!doc) return res.status(404).json({ error: { message: "Project not found" } });
+  if (!doc)
+    return res.status(404).json({ error: { message: 'Project not found' } });
   res.json({ deleted: true });
 });
 const getTeam = asyncHandler(async (req, res) => {
@@ -46,21 +49,20 @@ const getTeam = asyncHandler(async (req, res) => {
 
   // 1) MongoDB: get project + team members
   const project = await Project.findById(id)
-    .populate("owner", "name email affiliation")
-    .populate("collaborators", "name email affiliation")
+    .populate('owner', 'name email affiliation')
+    .populate('collaborators', 'name email affiliation')
     .lean();
 
   if (!project) {
-    return res.status(404).json({ error: { message: "Project not found" } });
+    return res.status(404).json({ error: { message: 'Project not found' } });
   }
 
   // Team = owner + collaborators
-  const members = [
-    project.owner,
-    ...(project.collaborators || [])
-  ].filter(Boolean);
+  const members = [project.owner, ...(project.collaborators || [])].filter(
+    Boolean
+  );
 
-  const memberIds = members.map(m => String(m._id));
+  const memberIds = members.map((m) => String(m._id));
 
   // 2) Neo4j: get collaborations inside the team (best-effort)
   let collaborations = [];
@@ -75,12 +77,12 @@ const getTeam = asyncHandler(async (req, res) => {
 
     const result = await runQuery(cypher, { ids: memberIds });
 
-    collaborations = result.records.map(r => ({
-      fromId: r.get("fromId"),
-      toId: r.get("toId"),
-      weight: r.get("weight").toNumber
-        ? r.get("weight").toNumber()
-        : Number(r.get("weight"))
+    collaborations = result.records.map((r) => ({
+      fromId: r.get('fromId'),
+      toId: r.get('toId'),
+      weight: r.get('weight').toNumber
+        ? r.get('weight').toNumber()
+        : Number(r.get('weight')),
     }));
   } catch (err) {
     // Neo4j optional: MongoDB part still valid
@@ -92,8 +94,8 @@ const getTeam = asyncHandler(async (req, res) => {
     title: project.title,
     teamCount: members.length,
     members,
-    collaborations
+    collaborations,
   });
 });
 
-module.exports = { create, list, getById, update, remove,getTeam};
+module.exports = { create, list, getById, update, remove, getTeam };
