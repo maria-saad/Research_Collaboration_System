@@ -3,11 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "rcs": "./cli.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "cli": "node cli.js",
+    "rcs": "node ./cli.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
     "prepare": "husky"
   },
   "keywords": [],
@@ -15,9 +21,11 @@
   "license": "ISC",
   "dependencies": {
     "cassandra-driver": "^4.8.0",
+    "chalk": "^4.1.2",
     "commander": "^14.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "execa": "^9.6.1",
     "express": "^5.2.1",
     "mongoose": "^9.1.1",
     "morgan": "^1.10.1",
@@ -35,15 +43,14 @@
     "prettier": "^3.8.1"
   },
   "lint": "eslint .",
-"format": "prettier --write .",
-"lint-staged": {
-  "**/*.{js,jsx,json,md}": [
-    "prettier --write"
-  ],
-  "**/*.{js,jsx}": [
-    "eslint --fix"
-  ]
-}
-
-
+  "format": "prettier --write .",
+  "prepare": "husky",
+  "lint-staged": {
+    "**/*.{js,jsx,json,md}": [
+      "prettier --write"
+    ],
+    "**/*.{js,jsx}": [
+      "eslint --fix"
+    ]
+  }
 }

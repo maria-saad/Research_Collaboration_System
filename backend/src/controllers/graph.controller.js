@@ -1,6 +1,6 @@
-const { asyncHandler } = require("../utils/asyncHandler");
-const { runQuery } = require("../services/neo4j.service");
-const Researcher = require("../models/Researcher");
+const { asyncHandler } = require('../utils/asyncHandler');
+const { runQuery } = require('../services/neo4j.service');
+const Researcher = require('../models/Researcher');
 
 // 1) Sync researcher from Mongo -> Neo4j
 // Creates/updates (:Researcher {id: <mongoId>, name, email})
@@ -9,7 +9,7 @@ const syncResearcher = asyncHandler(async (req, res) => {
 
   const researcher = await Researcher.findById(id).lean();
   if (!researcher) {
-    return res.status(404).json({ error: { message: "Researcher not found" } });
+    return res.status(404).json({ error: { message: 'Researcher not found' } });
   }
 
   const cypher = `
@@ -29,9 +29,9 @@ const syncResearcher = asyncHandler(async (req, res) => {
   res.json({
     synced: true,
     researcher: {
-      id: record.get("id"),
-      name: record.get("name"),
-      email: record.get("email"),
+      id: record.get('id'),
+      name: record.get('name'),
+      email: record.get('email'),
     },
   });
 });
@@ -42,13 +42,17 @@ const createCollaboration = asyncHandler(async (req, res) => {
   const { fromId, toId, weight } = req.body;
 
   if (!fromId || !toId) {
-    return res.status(400).json({ error: { message: "fromId and toId are required" } });
+    return res
+      .status(400)
+      .json({ error: { message: 'fromId and toId are required' } });
   }
   if (fromId === toId) {
-    return res.status(400).json({ error: { message: "fromId and toId must be different" } });
+    return res
+      .status(400)
+      .json({ error: { message: 'fromId and toId must be different' } });
   }
 
-  const w = typeof weight === "number" ? weight : 1;
+  const w = typeof weight === 'number' ? weight : 1;
 
   const cypher = `
     MERGE (a:Researcher {id: $fromId})
@@ -65,9 +69,9 @@ const createCollaboration = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     created: true,
-    fromId: record.get("fromId"),
-    toId: record.get("toId"),
-    weight: record.get("weight"),
+    fromId: record.get('fromId'),
+    toId: record.get('toId'),
+    weight: record.get('weight'),
   });
 });
 
@@ -85,9 +89,9 @@ const getCollaborators = asyncHandler(async (req, res) => {
   const result = await runQuery(cypher, { id });
 
   const collaborators = result.records.map((rec) => ({
-    id: rec.get("collaboratorId"),
-    name: rec.get("collaboratorName"),
-    email: rec.get("collaboratorEmail"),
+    id: rec.get('collaboratorId'),
+    name: rec.get('collaboratorName'),
+    email: rec.get('collaboratorEmail'),
   }));
 
   res.json({ researcherId: id, collaborators });

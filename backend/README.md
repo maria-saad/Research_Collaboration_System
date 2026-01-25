@@ -1,12 +1,14 @@
 # Research Collaboration System — Backend
 
 Backend API for a polyglot persistence system that combines:
+
 - **MongoDB** (document storage: Researchers / Projects / Publications)
 - **Neo4j** (collaboration graph)
 - **Redis** (caching layer)
 - **Express.js** (REST API)
 
 ## Features
+
 - CRUD APIs for Researchers / Projects / Publications (MongoDB)
 - Graph sync + collaboration relations + collaborator lookup (Neo4j)
 - Aggregated profile endpoint: Mongo + Neo4j in one response
@@ -16,6 +18,7 @@ Backend API for a polyglot persistence system that combines:
 ---
 
 ## Tech Stack
+
 - Node.js + Express
 - MongoDB + Mongoose
 - Neo4j + neo4j-driver
@@ -25,7 +28,8 @@ Backend API for a polyglot persistence system that combines:
 ---
 
 ## Project Structure
-2) Create .env file
+
+2. Create .env file
 
 Copy .env.example to .env:
 
@@ -36,14 +40,12 @@ Edit .env if needed.
 
 ////////////////
 
-Run Databases with Docker
-3) Start MongoDB + Neo4j + Redis
+Run Databases with Docker 3) Start MongoDB + Neo4j + Redis
 
 If docker-compose.yml exists in the project root:
 
 docker compose up -d
 docker compose ps
-
 
 Expected services:
 
@@ -62,13 +64,11 @@ user: neo4j
 pass: 123456789
 
 /////////////////////////////
-Run Backend API
-4) Install dependencies
+Run Backend API 4) Install dependencies
 npm install
 
-5) Start server (dev)
-npm run dev
-
+5. Start server (dev)
+   npm run dev
 
 API should run on:
 

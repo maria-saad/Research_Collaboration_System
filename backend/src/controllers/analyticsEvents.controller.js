@@ -1,12 +1,17 @@
-const analyticsEventsService = require("../services/analyticsEvents.service");
+const analyticsEventsService = require('../services/analyticsEvents.service');
 
 async function upsertEvent(req, res, next) {
   try {
     const { researcherId, year, metricType, value, computedAt } = req.body;
 
-    if (!researcherId || year === undefined || !metricType || value === undefined) {
+    if (
+      !researcherId ||
+      year === undefined ||
+      !metricType ||
+      value === undefined
+    ) {
       return res.status(400).json({
-        error: "researcherId, year, metricType and value are required",
+        error: 'researcherId, year, metricType and value are required',
       });
     }
 
@@ -18,7 +23,7 @@ async function upsertEvent(req, res, next) {
       computedAt,
     });
 
-    return res.status(201).json({ message: "Analytics event recorded" });
+    return res.status(201).json({ message: 'Analytics event recorded' });
   } catch (err) {
     next(err);
   }
@@ -27,7 +32,8 @@ async function upsertEvent(req, res, next) {
 async function getEventsByResearcher(req, res, next) {
   try {
     const { researcherId } = req.params;
-    const events = await analyticsEventsService.getEventsByResearcher(researcherId);
+    const events =
+      await analyticsEventsService.getEventsByResearcher(researcherId);
     return res.json(events);
   } catch (err) {
     next(err);

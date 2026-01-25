@@ -1,5 +1,5 @@
-const { v4: uuidv4 } = require("uuid");
-const { getCassandraClient } = require("../config/cassandra");
+const { v4: uuidv4 } = require('uuid');
+const { getCassandraClient } = require('../config/cassandra');
 
 async function createNote({ researcherId, content }) {
   const client = getCassandraClient();
@@ -22,7 +22,9 @@ async function getAllNotes(limit = 50) {
 
   // Cassandra: SELECT بدون WHERE على partition key ليس ideal، لكن ok للديمو
   const query = `SELECT id, researcher_id, content, created_at FROM notes LIMIT ?`;
-  const result = await client.execute(query, [Number(limit)], { prepare: true });
+  const result = await client.execute(query, [Number(limit)], {
+    prepare: true,
+  });
 
   return result.rows;
 }

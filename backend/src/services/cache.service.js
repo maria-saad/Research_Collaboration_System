@@ -1,4 +1,4 @@
-const redisClient = require("../config/redis");
+const redisClient = require('../config/redis');
 
 const getCachedData = async (key) => {
   const data = await redisClient.get(key);

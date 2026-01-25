@@ -1,4 +1,4 @@
-const cassandra = require("cassandra-driver");
+const cassandra = require('cassandra-driver');
 
 let client;
 
@@ -6,17 +6,17 @@ function parseContactPoints() {
   const raw =
     process.env.CASSANDRA_CONTACT_POINTS ||
     process.env.CASSANDRA_NODES ||
-    "127.0.0.1";
+    '127.0.0.1';
 
-  const items = (raw || "")
-    .split(",")
+  const items = (raw || '')
+    .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
 
-  const hosts = items.map((x) => x.split(":")[0].trim());
+  const hosts = items.map((x) => x.split(':')[0].trim());
 
-  const firstPort = items[0]?.includes(":")
-    ? Number(items[0].split(":")[1])
+  const firstPort = items[0]?.includes(':')
+    ? Number(items[0].split(':')[1])
     : 9042;
 
   return {
@@ -29,12 +29,12 @@ async function initCassandra() {
   const localDataCenter =
     process.env.CASSANDRA_LOCAL_DATACENTER ||
     process.env.CASSANDRA_DC ||
-    "datacenter1";
+    'datacenter1';
 
-  const keyspace = process.env.CASSANDRA_KEYSPACE || "analytics";
+  const keyspace = process.env.CASSANDRA_KEYSPACE || 'analytics';
 
   const { hosts, port } = parseContactPoints();
-  if (!hosts.length) throw new Error("Cassandra hosts list is empty.");
+  if (!hosts.length) throw new Error('Cassandra hosts list is empty.');
 
   // 1) client بدون keyspace (فقط لإنشاء الـ keyspace)
   const bootstrapClient = new cassandra.Client({
@@ -44,9 +44,9 @@ async function initCassandra() {
     socketOptions: { connectTimeout: 10000 },
   });
 
-  console.log("Connecting to Cassandra (bootstrap)...");
+  console.log('Connecting to Cassandra (bootstrap)...');
   await bootstrapClient.connect();
-  console.log("Cassandra connected (bootstrap)");
+  console.log('Cassandra connected (bootstrap)');
 
   // replication_factor=3 (مناسب لـ 3-node cluster)
   await bootstrapClient.execute(
@@ -68,7 +68,7 @@ async function initCassandra() {
 
   console.log(`Connecting to Cassandra (keyspace=${keyspace})...`);
   await client.connect();
-  console.log("Cassandra connected");
+  console.log('Cassandra connected');
 
   // 4) Create tables داخل نفس keyspace
   await client.execute(`
@@ -91,18 +91,18 @@ async function initCassandra() {
     ) WITH CLUSTERING ORDER BY (year DESC, metric_type ASC)
   `);
 
-  console.log("Cassandra keyspace & tables ready");
+  console.log('Cassandra keyspace & tables ready');
 }
 
 function getCassandraClient() {
-  if (!client) throw new Error("Cassandra client not initialized");
+  if (!client) throw new Error('Cassandra client not initialized');
   return client;
 }
 
 async function shutdownCassandra() {
   if (client) {
     await client.shutdown();
-    console.log("Cassandra disconnected");
+    console.log('Cassandra disconnected');
   }
 }
 
