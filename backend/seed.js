@@ -76,7 +76,7 @@ async function seed() {
     console.log(`👤 Created ${createdResearchers.length} researchers`);
 
     // 4) إنشاء المشاريع (توزيع ملكيات وتعاون مختلف)
-    const projects = await Project.create([
+    await Project.create([
       {
         title: 'NextGen AI Platform',
         description: 'Exploring deep learning for healthcare.',

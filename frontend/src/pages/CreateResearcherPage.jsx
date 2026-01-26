@@ -22,7 +22,7 @@ export default function CreateResearcherPage() {
         affiliation,
         interests: interests
           .split(",")
-          .map(s => s.trim())
+          .map((s) => s.trim())
           .filter(Boolean),
       };
 
@@ -33,7 +33,9 @@ export default function CreateResearcherPage() {
       setAffiliation("");
       setInterests("");
     } catch (e2) {
-      setErr(e2?.response?.data?.error?.message || e2.message || "Create failed");
+      setErr(
+        e2?.response?.data?.error?.message || e2.message || "Create failed",
+      );
     }
   };
 
@@ -41,27 +43,59 @@ export default function CreateResearcherPage() {
     <div style={{ padding: 12 }}>
       <h2>Create Researcher</h2>
       <ErrorBox message={err} />
-      {msg ? <div style={{ padding: 10, background: "#eef9ee", border: "1px solid #b7e3b7" }}>{msg}</div> : null}
+      {msg ? (
+        <div
+          style={{
+            padding: 10,
+            background: "#eef9ee",
+            border: "1px solid #b7e3b7",
+          }}
+        >
+          {msg}
+        </div>
+      ) : null}
 
       <form onSubmit={submit} style={{ marginTop: 12 }}>
         <div style={{ marginBottom: 10 }}>
-          <label>Name</label><br />
-          <input value={name} onChange={(e) => setName(e.target.value)} required style={{ width: 380 }} />
+          <label>Name</label>
+          <br />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            style={{ width: 380 }}
+          />
         </div>
 
         <div style={{ marginBottom: 10 }}>
-          <label>Email</label><br />
-          <input value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: 380 }} />
+          <label>Email</label>
+          <br />
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ width: 380 }}
+          />
         </div>
 
         <div style={{ marginBottom: 10 }}>
-          <label>Affiliation</label><br />
-          <input value={affiliation} onChange={(e) => setAffiliation(e.target.value)} style={{ width: 380 }} />
+          <label>Affiliation</label>
+          <br />
+          <input
+            value={affiliation}
+            onChange={(e) => setAffiliation(e.target.value)}
+            style={{ width: 380 }}
+          />
         </div>
 
         <div style={{ marginBottom: 10 }}>
-          <label>Interests (comma-separated)</label><br />
-          <input value={interests} onChange={(e) => setInterests(e.target.value)} style={{ width: 380 }} />
+          <label>Interests (comma-separated)</label>
+          <br />
+          <input
+            value={interests}
+            onChange={(e) => setInterests(e.target.value)}
+            style={{ width: 380 }}
+          />
         </div>
 
         <button type="submit">Create</button>

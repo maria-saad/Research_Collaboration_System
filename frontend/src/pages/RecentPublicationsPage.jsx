@@ -18,8 +18,8 @@ export default function RecentPublicationsPage() {
     } catch (e) {
       setErr(
         e?.response?.data?.error?.message ||
-        e.message ||
-        "Failed to load recent publications"
+          e.message ||
+          "Failed to load recent publications",
       );
     } finally {
       setLoading(false);
@@ -44,7 +44,7 @@ export default function RecentPublicationsPage() {
           gap: 10,
           alignItems: "center",
           marginTop: 10,
-          marginBottom: 10
+          marginBottom: 10,
         }}
       >
         <label>
@@ -100,8 +100,6 @@ export default function RecentPublicationsPage() {
               </tbody>
             </table>
           )}
-
-        
         </>
       )}
     </div>

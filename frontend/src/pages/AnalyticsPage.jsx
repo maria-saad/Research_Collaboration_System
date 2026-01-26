@@ -19,8 +19,8 @@ export default function AnalyticsPage() {
     } catch (e) {
       setErr(
         e?.response?.data?.error?.message ||
-        e.message ||
-        "Failed to load analytics"
+          e.message ||
+          "Failed to load analytics",
       );
     } finally {
       setLoading(false);
@@ -43,7 +43,14 @@ export default function AnalyticsPage() {
 
       <ErrorBox message={err} />
 
-      <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
+      <div
+        style={{
+          marginTop: 10,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
         <label>
           Limit:&nbsp;
           <input
@@ -56,9 +63,7 @@ export default function AnalyticsPage() {
           />
         </label>
 
-        <button onClick={() => load(limit)}>
-          Refresh
-        </button>
+        <button onClick={() => load(limit)}>Refresh</button>
 
         {data && "source" in data && (
           <div style={{ marginLeft: "auto" }}>
@@ -72,9 +77,7 @@ export default function AnalyticsPage() {
       {!loading && data ? (
         <>
           {(data.topResearchers || []).length === 0 ? (
-            <div style={{ marginTop: 12 }}>
-              No analytics results found.
-            </div>
+            <div style={{ marginTop: 12 }}>No analytics results found.</div>
           ) : (
             <table
               border="1"
@@ -82,7 +85,7 @@ export default function AnalyticsPage() {
               style={{
                 borderCollapse: "collapse",
                 marginTop: 12,
-                width: "100%"
+                width: "100%",
               }}
             >
               <thead>
@@ -105,8 +108,6 @@ export default function AnalyticsPage() {
               </tbody>
             </table>
           )}
-
-   
         </>
       ) : null}
     </div>

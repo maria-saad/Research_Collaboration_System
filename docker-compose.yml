@@ -13,8 +13,8 @@ services:
     image: neo4j:5
     container_name: rcs-neo4j
     ports:
-      - "7474:7474"   # Neo4j Browser
-      - "7687:7687"   # Bolt protocol
+      - "7474:7474" # Neo4j Browser
+      - "7687:7687" # Bolt protocol
     environment:
       - NEO4J_AUTH=neo4j/123456789
     volumes:
