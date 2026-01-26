@@ -8,24 +8,32 @@ const linkStyle = ({ isActive }) => ({
 
 export default function NavBar() {
   return (
-    <div style={{ padding: 12, borderBottom: "1px solid #ddd", marginBottom: 16 }}>
+    <div
+      style={{ padding: 12, borderBottom: "1px solid #ddd", marginBottom: 16 }}
+    >
       <Link to="/" style={{ marginRight: 18, textDecoration: "none" }}>
         <strong>RCS</strong>
       </Link>
 
-      <NavLink to="/researchers" style={linkStyle}>Researchers</NavLink>
-      
-            <NavLink to="/publications/recent" style={linkStyle}>
-              Recent Publications
-            </NavLink>
+      <NavLink to="/researchers" style={linkStyle}>
+        Researchers
+      </NavLink>
 
-            <NavLink to="/projects/team" style={linkStyle}>
-              Project Team
-            </NavLink>
-      <NavLink to="/analytics" style={linkStyle}>Analytics</NavLink>
-      <NavLink to="/create" style={linkStyle}>Create</NavLink>
+      <NavLink to="/publications/recent" style={linkStyle}>
+        Recent Publications
+      </NavLink>
+
+      <NavLink to="/projects/team" style={linkStyle}>
+        Project Team
+      </NavLink>
+      <NavLink to="/analytics" style={linkStyle}>
+        Analytics
+      </NavLink>
+      <NavLink to="/create" style={linkStyle}>
+        Create
+      </NavLink>
       <NavLink to="/projects">Projects </NavLink>
-<NavLink to="/publications">Publications </NavLink>
+      <NavLink to="/publications">Publications </NavLink>
     </div>
   );
 }

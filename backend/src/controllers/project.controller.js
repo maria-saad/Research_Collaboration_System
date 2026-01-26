@@ -84,7 +84,7 @@ const getTeam = asyncHandler(async (req, res) => {
         ? r.get('weight').toNumber()
         : Number(r.get('weight')),
     }));
-  } catch (err) {
+  } catch {
     // Neo4j optional: MongoDB part still valid
     collaborations = [];
   }

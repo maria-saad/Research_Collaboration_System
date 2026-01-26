@@ -1,21 +1,21 @@
 // eslint.config.js — ESLint v9 (Flat Config)
 module.exports = [
   {
-    files: ["**/*.js"],
-    ignores: ["node_modules/**"],
+    files: ['**/*.js'],
+    ignores: ['node_modules/**'],
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "commonjs",
+      ecmaVersion: 'latest',
+      sourceType: 'commonjs',
       globals: {
-        process: "readonly",
-        console: "readonly",
-        __dirname: "readonly",
-        module: "readonly",
-        require: "readonly",
+        process: 'readonly',
+        console: 'readonly',
+        __dirname: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
       },
     },
     rules: {
-      "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
 ];

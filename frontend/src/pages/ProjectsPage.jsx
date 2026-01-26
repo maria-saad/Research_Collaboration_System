@@ -7,8 +7,8 @@ const emptyForm = {
   title: "",
   description: "",
   domain: "",
-  owner: "",          // ResearcherId
-  collaborators: ""   // comma-separated ids
+  owner: "", // ResearcherId
+  collaborators: "", // comma-separated ids
 };
 
 export default function ProjectsPage() {
@@ -27,13 +27,19 @@ export default function ProjectsPage() {
       const data = await projectsApi.list();
       setItems(Array.isArray(data) ? data : []);
     } catch (e) {
-      setErr(e?.response?.data?.error?.message || e.message || "Failed to load projects");
+      setErr(
+        e?.response?.data?.error?.message ||
+          e.message ||
+          "Failed to load projects",
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const onChange = (k, v) => setForm((prev) => ({ ...prev, [k]: v }));
 
@@ -54,8 +60,11 @@ export default function ProjectsPage() {
         domain: form.domain.trim(),
         owner: form.owner.trim(),
         collaborators: form.collaborators.trim()
-          ? form.collaborators.split(",").map(s => s.trim()).filter(Boolean)
-          : []
+          ? form.collaborators
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
       };
 
       if (!payload.title) throw new Error("Title is required");
@@ -83,10 +92,13 @@ export default function ProjectsPage() {
       title: p.title || "",
       description: p.description || "",
       domain: p.domain || "",
-      owner: (p.owner && typeof p.owner === "object") ? p.owner._id : (p.owner || ""),
+      owner:
+        p.owner && typeof p.owner === "object" ? p.owner._id : p.owner || "",
       collaborators: Array.isArray(p.collaborators)
-        ? p.collaborators.map(c => (typeof c === "object" ? c._id : c)).join(", ")
-        : ""
+        ? p.collaborators
+            .map((c) => (typeof c === "object" ? c._id : c))
+            .join(", ")
+        : "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -115,7 +127,9 @@ export default function ProjectsPage() {
 
       {/* Form */}
       <div style={{ marginTop: 10, padding: 12, border: "1px solid #ddd" }}>
-        <h3 style={{ marginTop: 0 }}>{editId ? "Update Project" : "Add Project"}</h3>
+        <h3 style={{ marginTop: 0 }}>
+          {editId ? "Update Project" : "Add Project"}
+        </h3>
 
         <form onSubmit={submit}>
           <div style={{ display: "grid", gap: 8 }}>
@@ -180,7 +194,11 @@ export default function ProjectsPage() {
       </div>
 
       {/* Table */}
-      <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", marginTop: 12, width: "100%" }}>
+      <table
+        border="1"
+        cellPadding="8"
+        style={{ borderCollapse: "collapse", marginTop: 12, width: "100%" }}
+      >
         <thead>
           <tr>
             <th>Title</th>
@@ -195,16 +213,32 @@ export default function ProjectsPage() {
             <tr key={p._id}>
               <td>{p.title}</td>
               <td>{p.domain || "-"}</td>
-              <td>{(p.owner && typeof p.owner === "object") ? (p.owner.name || p.owner._id) : (p.owner || "-")}</td>
-              <td>{Array.isArray(p.collaborators) ? p.collaborators.length : 0}</td>
+              <td>
+                {p.owner && typeof p.owner === "object"
+                  ? p.owner.name || p.owner._id
+                  : p.owner || "-"}
+              </td>
+              <td>
+                {Array.isArray(p.collaborators) ? p.collaborators.length : 0}
+              </td>
               <td style={{ whiteSpace: "nowrap" }}>
-                <button disabled={busy} onClick={() => startEdit(p)}>Edit</button>
-                <button disabled={busy} onClick={() => remove(p._id)} style={{ marginLeft: 8 }}>Delete</button>
+                <button disabled={busy} onClick={() => startEdit(p)}>
+                  Edit
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() => remove(p._id)}
+                  style={{ marginLeft: 8 }}
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
           {items.length === 0 ? (
-            <tr><td colSpan="5">No projects found.</td></tr>
+            <tr>
+              <td colSpan="5">No projects found.</td>
+            </tr>
           ) : null}
         </tbody>
       </table>

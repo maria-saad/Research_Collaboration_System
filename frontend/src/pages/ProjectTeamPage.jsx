@@ -20,8 +20,8 @@ export default function ProjectTeamPage() {
     } catch (e) {
       setErr(
         e?.response?.data?.error?.message ||
-        e.message ||
-        "Failed to load project team"
+          e.message ||
+          "Failed to load project team",
       );
     } finally {
       setLoading(false);

@@ -41,5 +41,5 @@ export const researchersApi = {
   profile: async (id) => {
     const res = await api.get(`/researchers/${id}/profile`);
     return res.data;
-  }
+  },
 };

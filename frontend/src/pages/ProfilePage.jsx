@@ -22,8 +22,8 @@ export default function ProfilePage() {
       } catch (e) {
         setErr(
           e?.response?.data?.error?.message ||
-          e.message ||
-          "Failed to load profile"
+            e.message ||
+            "Failed to load profile",
         );
       } finally {
         if (mounted) setLoading(false);
@@ -54,7 +54,7 @@ export default function ProfilePage() {
               marginTop: 10,
               padding: 12,
               border: "1px solid #ddd",
-              borderRadius: 6
+              borderRadius: 6,
             }}
           >
             {"source" in data && (

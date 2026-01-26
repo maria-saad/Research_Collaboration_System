@@ -1,17 +1,17 @@
-const { Command } = require("commander");
+const { Command } = require('commander');
 
-const registerDb = require("./commands/db");
-const registerCache = require("./commands/cache");
-const registerServer = require("./commands/server");
-const registerHealth = require("./commands/health");
+const registerDb = require('./commands/db');
+const registerCache = require('./commands/cache');
+const registerServer = require('./commands/server');
+const registerHealth = require('./commands/health');
 
 function buildProgram() {
   const program = new Command();
 
   program
-    .name("rcs")
-    .description("Research Collaboration System (RCS) CLI")
-    .version("1.0.0");
+    .name('rcs')
+    .description('Research Collaboration System (RCS) CLI')
+    .version('1.0.0');
 
   registerDb(program);
   registerCache(program);

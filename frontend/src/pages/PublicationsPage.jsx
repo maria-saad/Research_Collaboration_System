@@ -9,7 +9,7 @@ const emptyForm = {
   venue: "",
   keywords: "",
   authors: "", // comma-separated researcher ids
-  project: ""  // optional project id
+  project: "", // optional project id
 };
 
 export default function PublicationsPage() {
@@ -28,13 +28,19 @@ export default function PublicationsPage() {
       const data = await publicationsApi.list();
       setItems(Array.isArray(data) ? data : []);
     } catch (e) {
-      setErr(e?.response?.data?.error?.message || e.message || "Failed to load publications");
+      setErr(
+        e?.response?.data?.error?.message ||
+          e.message ||
+          "Failed to load publications",
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const onChange = (k, v) => setForm((prev) => ({ ...prev, [k]: v }));
 
@@ -54,17 +60,25 @@ export default function PublicationsPage() {
         year: Number(form.year),
         venue: form.venue.trim(),
         keywords: form.keywords.trim()
-          ? form.keywords.split(",").map(s => s.trim()).filter(Boolean)
+          ? form.keywords
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
           : [],
         authors: form.authors.trim()
-          ? form.authors.split(",").map(s => s.trim()).filter(Boolean)
+          ? form.authors
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
           : [],
         ...(form.project.trim() ? { project: form.project.trim() } : {}),
       };
 
       if (!payload.title) throw new Error("Title is required");
-      if (!payload.year || Number.isNaN(payload.year)) throw new Error("Year must be a number");
-      if (!payload.authors.length) throw new Error("At least one author is required");
+      if (!payload.year || Number.isNaN(payload.year))
+        throw new Error("Year must be a number");
+      if (!payload.authors.length)
+        throw new Error("At least one author is required");
 
       if (editId) {
         await publicationsApi.update(editId, payload);
@@ -86,7 +100,7 @@ export default function PublicationsPage() {
     setEditId(p._id);
 
     const authorsStr = Array.isArray(p.authors)
-      ? p.authors.map(a => (typeof a === "object" ? a._id : a)).join(", ")
+      ? p.authors.map((a) => (typeof a === "object" ? a._id : a)).join(", ")
       : "";
 
     setForm({
@@ -95,7 +109,10 @@ export default function PublicationsPage() {
       venue: p.venue || "",
       keywords: Array.isArray(p.keywords) ? p.keywords.join(", ") : "",
       authors: authorsStr,
-      project: (p.project && typeof p.project === "object") ? p.project._id : (p.project || "")
+      project:
+        p.project && typeof p.project === "object"
+          ? p.project._id
+          : p.project || "",
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -125,7 +142,9 @@ export default function PublicationsPage() {
 
       {/* Form */}
       <div style={{ marginTop: 10, padding: 12, border: "1px solid #ddd" }}>
-        <h3 style={{ marginTop: 0 }}>{editId ? "Update Publication" : "Add Publication"}</h3>
+        <h3 style={{ marginTop: 0 }}>
+          {editId ? "Update Publication" : "Add Publication"}
+        </h3>
 
         <form onSubmit={submit}>
           <div style={{ display: "grid", gap: 8 }}>
@@ -201,7 +220,11 @@ export default function PublicationsPage() {
       </div>
 
       {/* Table */}
-      <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", marginTop: 12, width: "100%" }}>
+      <table
+        border="1"
+        cellPadding="8"
+        style={{ borderCollapse: "collapse", marginTop: 12, width: "100%" }}
+      >
         <thead>
           <tr>
             <th>Title</th>
@@ -219,13 +242,23 @@ export default function PublicationsPage() {
               <td>{p.venue || "-"}</td>
               <td>{Array.isArray(p.authors) ? p.authors.length : 0}</td>
               <td style={{ whiteSpace: "nowrap" }}>
-                <button disabled={busy} onClick={() => startEdit(p)}>Edit</button>
-                <button disabled={busy} onClick={() => remove(p._id)} style={{ marginLeft: 8 }}>Delete</button>
+                <button disabled={busy} onClick={() => startEdit(p)}>
+                  Edit
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() => remove(p._id)}
+                  style={{ marginLeft: 8 }}
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
           {items.length === 0 ? (
-            <tr><td colSpan="5">No publications found.</td></tr>
+            <tr>
+              <td colSpan="5">No publications found.</td>
+            </tr>
           ) : null}
         </tbody>
       </table>

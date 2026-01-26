@@ -17,7 +17,8 @@ services:
     volumes:
       - cassandra1_data:/var/lib/cassandra
     healthcheck:
-      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
+      test:
+        ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 20
@@ -40,7 +41,8 @@ services:
     volumes:
       - cassandra2_data:/var/lib/cassandra
     healthcheck:
-      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
+      test:
+        ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 20
@@ -63,7 +65,8 @@ services:
     volumes:
       - cassandra3_data:/var/lib/cassandra
     healthcheck:
-      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
+      test:
+        ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' 127.0.0.1 9042 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 20

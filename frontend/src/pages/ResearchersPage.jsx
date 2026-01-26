@@ -15,16 +15,21 @@ export default function ResearchersPage() {
       try {
         setErr("");
         const data = await researchersApi.list();
-if (mounted) setItems(data);
-
+        if (mounted) setItems(data);
       } catch (e) {
-        setErr(e?.response?.data?.error?.message || e.message || "Failed to load researchers");
+        setErr(
+          e?.response?.data?.error?.message ||
+            e.message ||
+            "Failed to load researchers",
+        );
       } finally {
         if (mounted) setLoading(false);
       }
     })();
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading) return <Loader text="Loading researchers..." />;
@@ -32,15 +37,16 @@ if (mounted) setItems(data);
     <div style={{ padding: 12 }}>
       <h2>Researchers</h2>
       <ErrorBox message={err} />
-<div style={{ marginBottom: 12 }}>
-
-
-</div>
+      <div style={{ marginBottom: 12 }}></div>
 
       {items.length === 0 ? (
         <div>No researchers found. Create one from Create page.</div>
       ) : (
-        <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", marginTop: 12, width: "100%" }}>
+        <table
+          border="1"
+          cellPadding="8"
+          style={{ borderCollapse: "collapse", marginTop: 12, width: "100%" }}
+        >
           <thead>
             <tr>
               <th>Name</th>
