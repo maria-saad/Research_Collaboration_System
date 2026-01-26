@@ -2,12 +2,11 @@
 . "$(dirname "$0")/_/husky.sh"
 
 commit_msg_file="$1"
-commit_msg=$(cat "$commit_msg_file")
 
 # Jira ticket pattern (مثال: RCS-12)
 JIRA_REGEX="RCS-[0-9]+"
 
-if ! echo "$commit_msg" | grep -qE "$JIRA_REGEX"; then
+if ! grep -qE "$JIRA_REGEX" "$commit_msg_file"; then
   echo "❌ Commit rejected."
   echo "👉 Commit message must include a Jira ticket ID (e.g. RCS-12)"
   echo "👉 Example: feat(RCS-12): add project creation endpoint"
