@@ -41,7 +41,7 @@ async function checkRedis() {
     await client.quit();
 
     console.log(chalk.green('Redis       : OK'));
-  } catch{
+  } catch {
     console.log(chalk.red('Redis       : FAIL'));
   }
 }
@@ -56,7 +56,7 @@ async function checkNeo4j() {
     await driver.close();
 
     console.log(chalk.green('Neo4j       : OK'));
-  } catch  {
+  } catch {
     console.log(chalk.red('Neo4j       : FAIL'));
   }
 }
@@ -68,7 +68,7 @@ async function checkCassandra() {
     await client.execute('SELECT now() FROM system.local');
 
     console.log(chalk.green('Cassandra   : OK'));
-  } catch{
+  } catch {
     console.log(chalk.red('Cassandra   : FAIL'));
   }
 }

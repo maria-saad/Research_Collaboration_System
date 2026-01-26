@@ -5,7 +5,7 @@ module.exports = function registerCache(program) {
   const cache = program.command('cache').description('Cache operations');
 
   cache
-    .command('clear')
+        .command('clear')
     .description('Clear Redis cache (FLUSHDB)')
     .action(async () => {
       // ensure absolute path to backend/config/redis.js
