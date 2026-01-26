@@ -4,7 +4,7 @@
 commit_msg_file="$1"
 
 # Jira ticket pattern (مثال: RCS-12)
-JIRA_REGEX="RCS-[0-9]+"
+JIRA_REGEX="RC-[0-9]+"
 
 if ! grep -qE "$JIRA_REGEX" "$commit_msg_file"; then
   echo "❌ Commit rejected."
