@@ -1,7 +1,14 @@
-function errorHandler(err, req, res, _next) {
-  console.error(err);
+const { logger } = require('../logger');
 
-  const status = err.statusCode || 500;
+function errorHandler(err, req, res, next) {
+  logger.error('Unhandled error', {
+    message: err.message,
+    stack: err.stack,
+    path: req.originalUrl,
+    method: req.method,
+  });
+
+  const status = err.statusCode || err.status || 500;
   res.status(status).json({
     error: {
       message: err.message || 'Internal Server Error',

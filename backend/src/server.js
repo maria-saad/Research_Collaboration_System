@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const app = require('./app');
-const logger = require('./logger');
+const { logger } = require('./logger');
 
 // ===== Database configs =====
 const { connectMongo } = require('./config/mongo');
@@ -16,50 +16,67 @@ const PORT = process.env.PORT || 5000;
   try {
     logger.info('Starting Research Collaboration Backend...');
 
-    // 1️⃣ MongoDB
+    // 1) MongoDB
     await connectMongo();
+    logger.info('MongoDB connected');
 
-    // 2️⃣ Redis
+    // 2) Redis
     await redisClient.connect();
+    logger.info('Redis connected');
 
-    // 3️⃣ Cassandra (3-node cluster)
+    // 3) Cassandra (3-node cluster)
     await initCassandra();
+    logger.info('Cassandra initialized');
 
-    // 4️⃣ Start HTTP server
+    // 4) Start HTTP server
     app.listen(PORT, () => {
-      console.log(`✅ API running on http://localhost:${PORT}`);
+      logger.info('API server started', { url: `http://localhost:${PORT}` });
     });
   } catch (err) {
-    logger.error(`Startup error: ${err.message}`);
+    logger.error('Startup error', { message: err.message, stack: err.stack });
     process.exit(1);
   }
 })();
 
 // ===== Graceful shutdown =====
 process.on('SIGINT', async () => {
-  console.log('\n🛑 Shutting down services...');
+  logger.warn('SIGINT received. Shutting down services...');
 
   try {
     // Cassandra
     await shutdownCassandra();
+    logger.info('Cassandra shutdown complete');
 
     // Redis
     if (redisClient.isOpen) {
       await redisClient.quit();
-      console.log('🟥 Redis disconnected');
+      logger.info('Redis disconnected');
     }
 
     // Neo4j
     await neo4jDriver.close();
-    console.log('🟦 Neo4j disconnected');
+    logger.info('Neo4j disconnected');
 
     // MongoDB
     const mongoose = require('mongoose');
     await mongoose.connection.close();
-    console.log('🟩 MongoDB disconnected');
+    logger.info('MongoDB disconnected');
   } catch (err) {
-    console.error('⚠️ Error during shutdown:', err);
+    logger.error('Error during shutdown', {
+      message: err.message,
+      stack: err.stack,
+    });
   } finally {
     process.exit(0);
   }
+});
+
+process.on('unhandledRejection', (reason) => {
+  logger.error('unhandledRejection', { reason });
+});
+
+process.on('uncaughtException', (err) => {
+  logger.error('uncaughtException', { message: err.message, stack: err.stack });
+  // في production غالبًا الأفضل:
+  // process.exit(1);
 });
