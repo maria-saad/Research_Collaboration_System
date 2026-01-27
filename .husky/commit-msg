@@ -8,7 +8,7 @@ JIRA_REGEX="RC-[0-9]+"
 
 if ! grep -qE "$JIRA_REGEX" "$commit_msg_file"; then
   echo "❌ Commit rejected."
-  echo "👉 Commit message must include a Jira ticket ID (e.g. RCS-12)"
-  echo "👉 Example: feat(RCS-12): add project creation endpoint"
+  echo "👉 Commit message must include a Jira ticket ID (e.g. RC-12)"
+  echo "👉 Example: feat(RC-12): add project creation endpoint"
   exit 1
 fi
