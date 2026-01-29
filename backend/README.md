@@ -138,3 +138,4 @@ Analytics (Neo4j + Redis)
 GET /api/analytics/top-researchers?limit=5
 
 returns { source: "db" | "cache", limit, topResearchers[] }
+“API documentation is available at /api/docs and generated automatically using Swagger (OpenAPI 3.0).”
