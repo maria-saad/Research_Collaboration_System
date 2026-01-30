@@ -5,6 +5,8 @@ const {
   createProjectSchema,
   updateProjectSchema,
 } = require('../validators/project.validator');
+const auth = require('../middlewares/authenticate');
+const authorize = require('../middlewares/authorize');
 /**
  * @openapi
  * tags:
@@ -163,10 +165,10 @@ const {
  */
 
 router.get('/:id/team', c.getTeam);
-router.post('/', validate(createProjectSchema), c.create);
+router.post('/', validate(createProjectSchema), auth, c.create);
 router.get('/', c.list);
 router.get('/:id', c.getById);
-router.put('/:id', validate(updateProjectSchema), c.update);
-router.delete('/:id', c.remove);
+router.put('/:id', validate(updateProjectSchema), auth, c.update);
+router.delete('/:id', auth, authorize(['admin']), c.remove);
 
 module.exports = router;
