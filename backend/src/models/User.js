@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema(
       enum: ['researcher', 'admin'],
       default: 'researcher',
     },
+    researcherId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Researcher',
+      default: null,
+    },
   },
   { timestamps: true }
 );

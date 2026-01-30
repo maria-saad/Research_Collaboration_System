@@ -14,7 +14,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "seed:admin": "node src/scripts/seedAdmin.js"
   },
   "keywords": [],
   "author": "",
