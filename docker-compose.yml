@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+  # ===== Databases =====
   mongo:
     image: mongo:6
     container_name: rcs-mongo
@@ -13,8 +14,8 @@ services:
     image: neo4j:5
     container_name: rcs-neo4j
     ports:
-      - "7474:7474" # Neo4j Browser
-      - "7687:7687" # Bolt protocol
+      - "7474:7474"
+      - "7687:7687"
     environment:
       - NEO4J_AUTH=neo4j/123456789
     volumes:
@@ -26,7 +27,58 @@ services:
     ports:
       - "6379:6379"
 
+  # ===== ELK Stack =====
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: rcs-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: rcs-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.4
+    container_name: rcs-logstash
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./backend/logs/app.log:/var/log/rcs/app.log:ro
+    ports:
+      - "5044:5044"
+
+  # ===== Monitoring (Prometheus + Grafana) =====
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: rcs-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: rcs-grafana
+    ports:
+      - "3001:3000"   # Grafana UI on 3001 (avoid conflict with backend 3000)
+    depends_on:
+      - prometheus
+
 volumes:
   mongo_data:
   neo4j_data:
-
+  es_data:
