@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const chalk = require('chalk');
+const colors = require('../utils/colors');
 const { run } = require('../lib/run');
 
 function resolveComposeFile(userProvided) {
@@ -33,10 +33,10 @@ module.exports = function registerDb(program) {
       const composeFile = resolveComposeFile(opts.file);
 
       try {
-        console.log(chalk.cyan(`Starting services using ${composeFile}...`));
+        console.log(colors.cyan(`Starting services using ${composeFile}...`));
         await run('docker', ['compose', '-f', composeFile, 'up', '-d']);
       } catch (e) {
-        console.error(chalk.red('docker compose up failed:'), e.message);
+        console.error(colors.red('docker compose up failed:'), e.message);
         process.exit(1);
       }
     });
@@ -51,10 +51,10 @@ module.exports = function registerDb(program) {
       const composeFile = resolveComposeFile(opts.file);
 
       try {
-        console.log(chalk.cyan(`Stopping services using ${composeFile}...`));
+        console.log(colors.cyan(`Stopping services using ${composeFile}...`));
         await run('docker', ['compose', '-f', composeFile, 'down']);
       } catch (e) {
-        console.error(chalk.red('docker compose down failed:'), e.message);
+        console.error(colors.red('docker compose down failed:'), e.message);
         process.exit(1);
       }
     });
@@ -75,7 +75,7 @@ module.exports = function registerDb(program) {
 
       try {
         console.log(
-          chalk.cyan(`Tailing logs for ${service} using ${composeFile}...`)
+          colors.cyan(`Tailing logs for ${service} using ${composeFile}...`)
         );
         await run('docker', [
           'compose',
@@ -88,7 +88,7 @@ module.exports = function registerDb(program) {
           '-f',
         ]);
       } catch (e) {
-        console.error(chalk.red('logs failed:'), e.message);
+        console.error(colors.red('logs failed:'), e.message);
         process.exit(1);
       }
     });
@@ -99,10 +99,10 @@ module.exports = function registerDb(program) {
     .action(async () => {
       try {
         const script = path.resolve(process.cwd(), 'seed.js');
-        console.log(chalk.cyan('Running seed.js ...'));
+        console.log(colors.cyan('Running seed.js ...'));
         await run('node', [script]);
       } catch (e) {
-        console.error(chalk.red('seed failed:'), e.message);
+        console.error(colors.red('seed failed:'), e.message);
         process.exit(1);
       }
     });
@@ -114,10 +114,10 @@ module.exports = function registerDb(program) {
     .action(async () => {
       try {
         const script = path.resolve(process.cwd(), 'seedAnalyticsEvents.js');
-        console.log(chalk.cyan('Running seedAnalyticsEvents.js ...'));
+        console.log(colors.cyan('Running seedAnalyticsEvents.js ...'));
         await run('node', [script]);
       } catch (e) {
-        console.error(chalk.red('seed-analytics failed:'), e.message);
+        console.error(colors.red('seed-analytics failed:'), e.message);
         process.exit(1);
       }
     });
