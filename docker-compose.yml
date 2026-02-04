@@ -106,7 +106,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "3000:80"
+      - "3005:80"
 
   # ===== ELK Stack =====
   elasticsearch:
