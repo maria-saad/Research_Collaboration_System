@@ -5,7 +5,8 @@
   "main": "test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "npx lint-staged"
+    "lint": "npx lint-staged",
+    "rcs:up": "node tools/rcs-up.js"
   },
   "devDependencies": {
     "husky": "^9.0.0",
