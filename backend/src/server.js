@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const app = require('./app');
-const { logger } = require('./logger');
+const logger = require('./logger'); // ✅ FIX: no destructuring
 
 // ===== Database configs =====
 const { connectMongo } = require('./config/mongo');
@@ -30,10 +30,10 @@ const PORT = process.env.PORT || 5000;
 
     // 4) Start HTTP server
     app.listen(PORT, () => {
-      logger.info('API server started', { url: `http://localhost:${PORT}` });
+      logger.info({ url: `http://localhost:${PORT}` }, 'API server started');
     });
   } catch (err) {
-    logger.error('Startup error', { message: err.message, stack: err.stack });
+    logger.error({ err }, 'Startup error');
     process.exit(1);
   }
 })();
@@ -62,21 +62,19 @@ process.on('SIGINT', async () => {
     await mongoose.connection.close();
     logger.info('MongoDB disconnected');
   } catch (err) {
-    logger.error('Error during shutdown', {
-      message: err.message,
-      stack: err.stack,
-    });
+    logger.error({ err }, 'Error during shutdown');
   } finally {
     process.exit(0);
   }
 });
 
 process.on('unhandledRejection', (reason) => {
-  logger.error('unhandledRejection', { reason });
+  // reason ممكن يكون Error أو أي شيء
+  logger.error({ err: reason }, 'unhandledRejection');
 });
 
 process.on('uncaughtException', (err) => {
-  logger.error('uncaughtException', { message: err.message, stack: err.stack });
+  logger.error({ err }, 'uncaughtException');
   // في production غالبًا الأفضل:
   // process.exit(1);
 });
