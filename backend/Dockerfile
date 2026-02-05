@@ -12,8 +12,6 @@ RUN npm ci --omit=dev --ignore-scripts
 # نسخ باقى الكود إلى الحاوية
 COPY . .
 
-# التأكد من وجود ملف البيئة داخل الحاوية عند البناء (اختيارى إذا ستستخدم environment فى Compose)
-COPY .env ./
 
 # تعريض المنفذ 5000
 EXPOSE 5000

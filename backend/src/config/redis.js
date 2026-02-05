@@ -1,22 +1,43 @@
 const redis = require('redis');
 
-const client = redis.createClient({
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    tls: true,
-  },
-  password: process.env.REDIS_PASSWORD,
-});
+let client = null;
 
-client.on('connect', () => {
-  console.log('Redis connected');
-});
+async function initRedis() {
+  // إذا ما في إعدادات Redis أصلاً → skip
+  if (!process.env.REDIS_HOST && !process.env.REDIS_URL) {
+    console.log('Redis disabled (no env vars).');
+    return null;
+  }
 
-client.on('error', (err) => {
-  console.error('Redis error', err);
-});
+  try {
+    client = process.env.REDIS_URL
+      ? redis.createClient({ url: process.env.REDIS_URL })
+      : redis.createClient({
+          password: process.env.REDIS_PASSWORD,
+          socket: {
+            host: process.env.REDIS_HOST,
+            port: Number(process.env.REDIS_PORT || 6380),
+            tls: true,
+            reconnectStrategy: false, // مهم: لا يعيد المحاولة للأبد
+          },
+        });
 
-client.connect();
+    client.on('error', (err) =>
+      console.log('Redis (optional) error:', err?.code || err?.message)
+    );
 
-module.exports = client;
+    await client.connect();
+    console.log('Redis connected (optional).');
+    return client;
+  } catch (e) {
+    console.log('Redis disabled (connect failed):', e?.code || e?.message);
+    client = null;
+    return null;
+  }
+}
+
+function getRedis() {
+  return client; // ممكن تكون null
+}
+
+module.exports = { initRedis, getRedis };
