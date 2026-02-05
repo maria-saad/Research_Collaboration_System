@@ -1,22 +1,22 @@
 const redis = require('redis');
 
-let client = null;
+const client = redis.createClient({
+  socket: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    tls: true,
+  },
+  password: process.env.REDIS_PASSWORD,
+});
 
-// إذا في Redis مفعّل وعنا host
-if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
-  client = redis.createClient({
-    socket: {
-      host: process.env.REDIS_HOST,
-      port: Number(process.env.REDIS_PORT),
-    },
-  });
+client.on('connect', () => {
+  console.log('Redis connected');
+});
 
-  client.on('connect', () => console.log('Redis connected'));
-  client.on('error', (err) => console.error('Redis error', err));
+client.on('error', (err) => {
+  console.error('Redis error', err);
+});
 
-  client.connect().catch(console.error);
-} else {
-  console.log('Redis is disabled (no REDIS_HOST/REDIS_PORT)');
-}
+client.connect();
 
 module.exports = client;
