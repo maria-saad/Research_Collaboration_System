@@ -99,8 +99,13 @@ process.on('SIGINT', async () => {
     }
 
     // Neo4j
-    await neo4jDriver.close();
-    logger.info('Neo4j disconnected');
+    // Neo4j (optional)
+    if (neo4jDriver) {
+      await neo4jDriver.close();
+      logger.info('Neo4j disconnected');
+    } else {
+      logger.info('Neo4j was disabled');
+    }
 
     // MongoDB
     const mongoose = require('mongoose');
