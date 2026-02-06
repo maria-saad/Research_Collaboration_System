@@ -1,3 +1,4 @@
+// backend/src/config/neo4j.js
 const neo4j = require('neo4j-driver');
 
 const uri = process.env.NEO4J_URI;
