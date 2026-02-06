@@ -1,3 +1,4 @@
+// backend/src/server.js
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -7,7 +8,7 @@ const { logger } = require('./logger');
 
 // ===== Database configs =====
 const { connectMongo } = require('./config/mongo');
-const redisClient = require('./config/redis');
+const { initRedis, getRedis } = require('./config/redis');
 const neo4jDriver = require('./config/neo4j');
 const { initCassandra, shutdownCassandra } = require('./config/cassandra');
 
@@ -39,16 +40,12 @@ let redisEnabled = redisEnabledByEnv && hasRedisConfig;
 
     // 2) Redis (optional)
     if (redisEnabled) {
-      try {
-        await redisClient.connect();
-        logger.info('Redis connected');
-      } catch (err) {
-        // خليه اختياري: لا تسكّر السيرفر
+      const client = await initRedis(); // بيرجع client أو null
+      if (client) {
+        logger.info('Redis connected (optional).');
+      } else {
         redisEnabled = false;
-        logger.warn('Redis not ready, continuing without it', {
-          message: err.message,
-          code: err.code,
-        });
+        logger.warn('Redis disabled (optional). Continuing without it.');
       }
     } else {
       logger.info(
@@ -72,7 +69,6 @@ let redisEnabled = redisEnabledByEnv && hasRedisConfig;
 
     // 4) Start HTTP server
     app.listen(PORT, () => {
-      // ملاحظة: على Azure رح يكون URL مختلف، بس خلّيها هيك عادي
       logger.info('API server started', { url: `http://localhost:${PORT}` });
     });
   } catch (err) {
@@ -93,13 +89,13 @@ process.on('SIGINT', async () => {
     }
 
     // Redis (optional)
-    if (redisEnabled && redisClient?.isOpen) {
-      await redisClient.quit();
+    const r = getRedis();
+    if (r?.isOpen) {
+      await r.quit();
       logger.info('Redis disconnected');
     }
 
     // Neo4j
-    // Neo4j (optional)
     if (neo4jDriver) {
       await neo4jDriver.close();
       logger.info('Neo4j disconnected');

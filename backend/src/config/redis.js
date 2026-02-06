@@ -1,3 +1,4 @@
+// backend/src/config/redis.js
 const redis = require('redis');
 
 let client = null;
