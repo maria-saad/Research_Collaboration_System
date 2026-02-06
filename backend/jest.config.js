@@ -9,4 +9,5 @@ module.exports = {
     '!src/domain/repositories/**',
     '!src/config/**',
   ],
+  setupFiles: ['<rootDir>/tests/jest.setup.js'],
 };

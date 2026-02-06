@@ -12,9 +12,12 @@ jest.mock('neo4j-driver', () => ({
   })),
 }));
 
-// ✅ أهم سطر: mock للـ neo4j.service اللي profile.controller غالبًا بيستخدمه
+const mockRunQueryOptional = jest.fn();
+const mockIsNeo4jEnabled = jest.fn(() => false);
+// ✅ mock للـ neo4j.service الذي يستخدمه profile.controller
 jest.mock('../src/services/neo4j.service', () => ({
-  runQuery: jest.fn(async () => ({ records: [] })), // ✅ حتى ما يوقع عند result.records
+  runQueryOptional: (...args) => mockRunQueryOptional(...args),
+  isNeo4jEnabled: () => mockIsNeo4jEnabled(),
 }));
 
 const mockGetCachedData = jest.fn();
@@ -44,7 +47,11 @@ const request = require('supertest');
 const app = require('../src/app');
 
 describe('Profile API (integration) - cached + db', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockRunQueryOptional.mockResolvedValue({ records: [] });
+    mockIsNeo4jEnabled.mockReturnValue(false);
+  });
 
   test('GET /api/researchers/:id/profile returns from cache when cached', async () => {
     mockGetCachedData.mockResolvedValue({
@@ -63,6 +70,19 @@ describe('Profile API (integration) - cached + db', () => {
 
   test('GET /api/researchers/:id/profile returns from db when not cached', async () => {
     mockGetCachedData.mockResolvedValue(null);
+    mockIsNeo4jEnabled.mockReturnValue(true);
+    mockRunQueryOptional.mockResolvedValue({
+      records: [
+        {
+          get: (key) => {
+            if (key === 'id') return 'c1';
+            if (key === 'name') return 'Neo Friend';
+            if (key === 'email') return 'neo@db.com';
+            return null;
+          },
+        },
+      ],
+    });
 
     // researcher
     mockResearcherFindById.mockReturnValue({
@@ -86,12 +106,11 @@ describe('Profile API (integration) - cached + db', () => {
     const res = await request(app).get('/api/researchers/r1/profile');
 
     expect(res.statusCode).toBe(200);
-    // حسب controller عندك ممكن يكتب source = "db" أو ما يكتب
     if (res.body.source) expect(res.body.source).toBe('db');
-
     expect(res.body).toEqual(
       expect.objectContaining({
         researcher: expect.objectContaining({ _id: 'r1' }),
+        collaborators: expect.any(Array),
       })
     );
     expect(mockSetCachedData).toHaveBeenCalled();

@@ -1,6 +1,6 @@
 const Project = require('../models/Project');
 const { asyncHandler } = require('../utils/asyncHandler');
-const { runQuery } = require('../services/neo4j.service');
+const { runQueryOptional } = require('../services/neo4j.service');
 
 const create = asyncHandler(async (req, res) => {
   const doc = await Project.create(req.body);
@@ -44,6 +44,7 @@ const remove = asyncHandler(async (req, res) => {
     return res.status(404).json({ error: { message: 'Project not found' } });
   res.json({ deleted: true });
 });
+
 const getTeam = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -65,9 +66,7 @@ const getTeam = asyncHandler(async (req, res) => {
   const memberIds = members.map((m) => String(m._id));
 
   // 2) Neo4j: get collaborations inside the team (best-effort)
-  let collaborations = [];
-  try {
-    const cypher = `
+  const cypher = `
       UNWIND $ids AS id
       MATCH (a:Researcher {id: id})
       MATCH (a)-[rel:COLLABORATES_WITH]->(b:Researcher)
@@ -75,19 +74,16 @@ const getTeam = asyncHandler(async (req, res) => {
       RETURN a.id AS fromId, b.id AS toId, coalesce(rel.weight, 1) AS weight
     `;
 
-    const result = await runQuery(cypher, { ids: memberIds });
+  const result = await runQueryOptional(cypher, { ids: memberIds });
 
-    collaborations = result.records.map((r) => ({
+  const collaborations =
+    result?.records?.map((r) => ({
       fromId: r.get('fromId'),
       toId: r.get('toId'),
       weight: r.get('weight').toNumber
         ? r.get('weight').toNumber()
         : Number(r.get('weight')),
-    }));
-  } catch {
-    // Neo4j optional: MongoDB part still valid
-    collaborations = [];
-  }
+    })) ?? [];
 
   res.json({
     projectId: id,

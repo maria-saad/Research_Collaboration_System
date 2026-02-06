@@ -1,14 +1,13 @@
-// backend/src/services/neo4j.service.js
 const driver = require('../config/neo4j');
 
-// هل Neo4j مفعّل؟
+// هل Neo4j مفعل؟
 function isNeo4jEnabled() {
   return Boolean(driver);
 }
 
 // helper لتشغيل query بأمان
 async function runQuery(cypher, params = {}) {
-  // إذا Neo4j مطفي → خطأ واضح (لـ endpoints اللي لازم Neo4j)
+  // إذا Neo4j معطل → خطأ واضح (للـ endpoints اللي لازم Neo4j)
   if (!driver) {
     const err = new Error('Neo4j is disabled in this deployment');
     err.statusCode = 503;
@@ -24,18 +23,19 @@ async function runQuery(cypher, params = {}) {
   }
 }
 
-// نسخة "اختيارية": إذا Neo4j مطفي رجّع null بدل ما ترمي error
+// نسخة "اختيارية": إذا Neo4j معطل رجّع null بدل ما ترمي error
 async function runQueryOptional(cypher, params = {}) {
   if (!driver) return null;
 
-  const session = driver.session();
+  let session;
   try {
+    session = driver.session();
     return await session.run(cypher, params);
   } catch (e) {
-    // لو صار error اتصال، اعتبريه غير متاح وخلاص (ما نكسر API)
+    // لو صار error اتصال، اعتبره غير متاح وخلاص (ما نكسر API)
     return null;
   } finally {
-    await session.close();
+    if (session) await session.close();
   }
 }
 

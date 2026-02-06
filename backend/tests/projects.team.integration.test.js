@@ -10,14 +10,14 @@ jest.mock('neo4j-driver', () => ({
   })),
 }));
 
-// ✅ mock runQuery من neo4j.service
-const mockRunQuery = jest.fn();
+// mock runQueryOptional from neo4j.service
+const mockRunQueryOptional = jest.fn();
 
 jest.mock('../src/services/neo4j.service', () => ({
-  runQuery: (...args) => mockRunQuery(...args),
+  runQueryOptional: (...args) => mockRunQueryOptional(...args),
 }));
 
-// ✅ mock Project model ليدعم findById().populate().populate().lean()
+// mock Project model ليدعم findById().populate().populate().lean()
 jest.mock('../src/models/Project', () => {
   const buildFindByIdChain = (doc) => ({
     populate: jest.fn(() => buildFindByIdChain(doc)),
@@ -58,12 +58,12 @@ const app = require('../src/app');
 
 describe('Projects Team API (integration)', () => {
   beforeEach(() => {
-    mockRunQuery.mockReset();
+    mockRunQueryOptional.mockReset();
   });
 
-  test('GET /api/projects/:id/team returns team + collaborations (neo4j best-effort)', async () => {
+  test('GET /api/projects/:id/team returns team + collaborations when Neo4j responds', async () => {
     // نرجّع records fake بنفس شكل neo4j driver: record.get(...)
-    mockRunQuery.mockResolvedValueOnce({
+    mockRunQueryOptional.mockResolvedValueOnce({
       records: [
         {
           get: (k) => {
@@ -89,10 +89,11 @@ describe('Projects Team API (integration)', () => {
       })
     );
     expect(res.body.members.length).toBe(2);
+    expect(res.body.collaborations.length).toBe(1);
   });
 
-  test('GET /api/projects/:id/team still returns 200 when neo4j fails (catch path)', async () => {
-    mockRunQuery.mockRejectedValueOnce(new Error('neo4j down'));
+  test('GET /api/projects/:id/team returns 200 with empty collaborations when Neo4j disabled/failed', async () => {
+    mockRunQueryOptional.mockResolvedValueOnce(null);
 
     const res = await request(app).get('/api/projects/p1/team');
 
@@ -100,9 +101,10 @@ describe('Projects Team API (integration)', () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         projectId: 'p1',
-        collaborations: [], // لأنه catch
+        collaborations: expect.any(Array),
       })
     );
+    expect(res.body.collaborations).toHaveLength(0);
   });
 
   test('GET /api/projects/:id/team returns 404 when project not found', async () => {
